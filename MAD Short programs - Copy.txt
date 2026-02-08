@@ -1,0 +1,207 @@
+                             MAD
+prog 1:
+
+package com.example.myapplication;
+
+import android.graphics.Color;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.myapplication.R;
+
+public class MainActivity extends AppCompatActivity {
+
+    int size = 20, i = 0;
+    int[] color = {Color.BLUE, Color.GREEN, Color.RED};
+
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_main);
+
+        TextView t = findViewById(R.id.textView1);
+
+        findViewById(R.id.button1).setOnClickListener(v ->
+                t.setTextSize(size += 4));
+
+        findViewById(R.id.button2).setOnClickListener(v ->
+                t.setTextColor(color[i++ % 3]));
+    }
+}
+
+
+
+
+PROG 2:
+
+package com.example.myapplication;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText e1,e2;
+
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_main);
+        e1 = findViewById(R.id.editText1);
+        e2 = findViewById(R.id.editText2);
+    }
+
+    public void calc(View v) {
+        float a = Float.parseFloat(e1.getText().toString());
+        float b = Float.parseFloat(e2.getText().toString());
+
+        if(v.getId()==R.id.button1)
+            Toast.makeText(this,"Ans:"+(a+b),Toast.LENGTH_SHORT).show();
+        else if(v.getId()==R.id.button3)
+            Toast.makeText(this,"Ans:"+(a-b),Toast.LENGTH_SHORT).show();
+        else {
+            e1.setText(""); e2.setText("");
+        }
+    }
+}
+
+
+
+
+Prog 3:
+
+
+package com.example.myapplication;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText x,y;
+    TextView r;
+
+    protected void onCreate(Bundle s){
+        super.onCreate(s);
+        setContentView(R.layout.activity_main);
+        x=findViewById(R.id.editText1);
+        y=findViewById(R.id.editText2);
+        r=findViewById(R.id.ResultView);
+    }
+
+    public void calc(View v){
+        float a=Float.parseFloat(x.getText().toString());
+        float b=Float.parseFloat(y.getText().toString());
+        r.setText(v.getId()==R.id.Add?""+(a+b):
+                v.getId()==R.id.Sub?""+(a-b):
+                        v.getId()==R.id.Mul?""+(a*b):
+                                v.getId()==R.id.Div?""+(a/b):"");
+        if(v.getId()==R.id.clearButton){ x.setText(""); y.setText(""); r.setText(""); }
+    }
+}
+
+
+
+Prog 4:
+
+
+package com.example.myapplication;
+
+import android.app.Activity;
+import android.graphics.*;
+import android.os.Bundle;
+import android.widget.ImageView;
+
+public class MainActivity extends Activity {
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_main);
+
+        Bitmap bg = Bitmap.createBitmap(720,1280,Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bg);
+        Paint p = new Paint(); p.setColor(Color.MAGENTA); p.setTextSize(50);
+
+        c.drawText("Rectangle",420,150,p); c.drawRect(400,200,650,700,p);
+        c.drawText("Circle",120,150,p); c.drawCircle(200,350,150,p);
+        c.drawText("Oval",130,590,p); c.drawOval(50,600,350,1000,p);
+        c.drawText("Line",480,800,p); c.drawLine(520,850,520,1150,p);
+
+        ((ImageView)findViewById(R.id.imageView)).setImageBitmap(bg);
+    }
+}
+
+
+XML file:
+
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/imageView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"/>
+
+
+Prog 5:
+
+
+package com.example.myapplication;
+import android.app.*;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+public class MainActivity extends Activity implements View.OnClickListener {
+    EditText Rollno, Name, Marks;
+    SQLiteDatabase db;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Rollno = findViewById(R.id.Rollno); Name = findViewById(R.id.Name); Marks = findViewById(R.id.Marks);
+        int[] ids = {R.id.Insert, R.id.Delete, R.id.Update, R.id.View, R.id.ViewAll, R.id.Clear};
+        for (int id : ids) findViewById(id).setOnClickListener(this);
+        db = openOrCreateDatabase("StudentDB", MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS student(rollno TEXT PRIMARY KEY, name TEXT, marks TEXT);");
+    }
+    @Override
+    public void onClick(View v) {
+        String r = Rollno.getText().toString().trim(), n = Name.getText().toString().trim(), m = Marks.getText().toString().trim();
+        int id = v.getId();
+        if (id == R.id.Insert) {
+            if (r.isEmpty() || n.isEmpty() || m.isEmpty()) show("Error", "Enter all fields");
+            else { db.execSQL("INSERT OR REPLACE INTO student VALUES(?,?,?)", new Object[]{r, n, m}); show("Success", "Added"); clear(); }
+        } else if (id == R.id.Delete) {
+            if (r.isEmpty()) show("Error", "Enter Rollno");
+            else { db.execSQL("DELETE FROM student WHERE rollno=?", new Object[]{r}); show("Success", "Deleted"); clear(); }
+        } else if (id == R.id.Update) {
+            if (r.isEmpty()) show("Error", "Enter Rollno");
+            else { db.execSQL("UPDATE student SET name=?, marks=? WHERE rollno=?", new Object[]{n, m, r}); show("Success", "Updated"); clear(); }
+        } else if (id == R.id.View) {
+            if (r.isEmpty()) show("Error", "Enter Rollno");
+            else {
+                Cursor c = db.rawQuery("SELECT * FROM student WHERE rollno=?", new String[]{r});
+                if (c.moveToFirst()) { Name.setText(c.getString(1)); Marks.setText(c.getString(2)); }
+                else show("Error", "Invalid Rollno");
+                c.close();
+            }
+        } else if (id == R.id.ViewAll) {
+            Cursor c = db.rawQuery("SELECT * FROM student", null);
+            if (c.getCount() == 0) show("Error", "No records");
+            else {
+                StringBuilder sb = new StringBuilder();
+                while (c.moveToNext()) sb.append("R: ").append(c.getString(0)).append(" N: ").append(c.getString(1)).append(" M: ").append(c.getString(2)).append("\n");
+                show("All", sb.toString());
+            }
+            c.close();
+        } else if (id == R.id.Clear) clear();
+    }
+
+    void clear() { Rollno.setText(""); Name.setText(""); Marks.setText(""); Rollno.requestFocus(); }
+    void show(String t, String msg) { new AlertDialog.Builder(this).setTitle(t).setMessage(msg).setPositiveButton("OK", null).show(); }
+}
+
